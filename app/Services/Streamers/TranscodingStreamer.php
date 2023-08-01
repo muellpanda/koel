@@ -33,6 +33,7 @@ class TranscodingStreamer extends Streamer implements TranscodingStreamerInterfa
             '-i ' . escapeshellarg($this->song->path),
             '-map 0:0',
             '-v 0',
+            '-filter:a volume=replaygain=album',
             "-ab {$bitRate}k",
             '-f mp3',
             '-',
