@@ -67,7 +67,7 @@ class AlbumRepository extends Repository
     {
         return Album::query()
             ->isStandard()
-            ->orderBy('name')
+            ->inRandomOrder()
             ->simplePaginate(21);
     }
 }

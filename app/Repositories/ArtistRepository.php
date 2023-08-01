@@ -55,7 +55,7 @@ class ArtistRepository extends Repository
     {
         return Artist::query()
             ->isStandard()
-            ->orderBy('name')
+            ->inRandomOrder()
             ->simplePaginate(21);
     }
 }
