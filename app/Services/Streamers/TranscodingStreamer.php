@@ -34,9 +34,11 @@ class TranscodingStreamer extends Streamer implements TranscodingStreamerInterfa
             '-map 0:0',
             '-v 0',
             '-filter:a volume=replaygain=album',
-            "-b {$bitRate}k",
-            '-c:a libopus',
-            '-f ogg',
+            "-ab {$bitRate}k",
+            '-f mp3',
+            //"-b {$bitRate}k",
+            //'-c:a libopus',
+            //'-f ogg',
             '-',
         ];
 
