@@ -65,8 +65,7 @@ class Streamer
             return true;
         }
 
-        return Str::endsWith(File::mimeType($this->song->storage_metadata->getPath()), 'flac')
-            && config('koel.streaming.transcode_flac')
+        return config('koel.streaming.transcode_flac')
             && is_executable(config('koel.streaming.ffmpeg_path'));
     }
 
