@@ -64,7 +64,7 @@ class ArtistRepository extends Repository
             ->accessibleBy($user ?? auth()->user())
             ->groupBy('artists.id')
             ->distinct()
-            ->orderBy('artists.name')
+            ->inRandomOrder()
             ->select('artists.*')
             ->simplePaginate(21);
     }
