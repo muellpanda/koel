@@ -84,7 +84,6 @@ class AlbumRepository extends Repository
             ->accessibleBy($user ?? $this->auth->user())
             ->isStandard()
             ->inRandomOrder()
-            //->groupBy('albums.id')
             ->distinct()
             ->select('albums.*')
             ->simplePaginate(21);
