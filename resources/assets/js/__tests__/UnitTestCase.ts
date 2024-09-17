@@ -45,6 +45,10 @@ export default abstract class UnitTestCase {
     this.mock(http, 'request') // prevent actual HTTP requests from being made
     this.user = userEvent.setup({ delay: null }) // @see https://github.com/testing-library/user-event/issues/833
 
+    this.setReadOnlyProperty(navigator, 'clipboard', {
+      writeText: vi.fn()
+    })
+
     this.beforeEach()
     this.afterEach()
     this.test()
@@ -55,6 +59,8 @@ export default abstract class UnitTestCase {
       commonStore.state.song_length = 10
       commonStore.state.allows_download = true
       commonStore.state.uses_i_tunes = true
+      commonStore.state.supports_batch_downloading = true
+      commonStore.state.supports_transcoding = true
       cb && cb()
     })
   }
