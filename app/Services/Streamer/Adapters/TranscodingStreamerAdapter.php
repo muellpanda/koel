@@ -18,6 +18,6 @@ class TranscodingStreamerAdapter implements StreamerAdapter
         $bitRate = filter_var(Arr::get($config, 'bit_rate'), FILTER_SANITIZE_NUMBER_INT)
             ?: config('koel.streaming.bitrate');
 
-        $this->streamLocalPath(TranscodeResult::getForSong($song, $bitRate)->path);
+        $this->streamLocalPath(TranscodeResult::getForSong($song, 256)->path);
     }
 }

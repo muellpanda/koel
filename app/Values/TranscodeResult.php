@@ -35,10 +35,8 @@ final class TranscodeResult
             '-i',
             $song->storage_metadata->getPath(),
             '-vn',
-            '-b:a',
-            "{$bitRate}k",
-            '-preset',
-            'ultrafast',
+            '-q:a',
+            '0',
             '-filter:a',
             'volume=replaygain=album',
             '-y', // Overwrite output file if it exists
