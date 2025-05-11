@@ -1,12 +1,12 @@
 import { reactive } from 'vue'
 import { differenceBy, unionBy } from 'lodash'
-import { http } from '@/services'
-import { arrayify } from '@/utils'
-import { songStore } from '@/stores'
+import { http } from '@/services/http'
+import { arrayify } from '@/utils/helpers'
+import { songStore } from '@/stores/songStore'
 
 export const favoriteStore = {
   state: reactive<{ playables: Playable[] }>({
-    playables: []
+    playables: [],
   }),
 
   async toggleOne (playable: Playable) {
@@ -45,5 +45,5 @@ export const favoriteStore = {
   async fetch () {
     this.state.playables = songStore.syncWithVault(await http.get<Playable[]>('songs/favorite'))
     return this.state.playables
-  }
+  },
 }

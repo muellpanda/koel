@@ -15,6 +15,7 @@ use getID3;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 use function Tests\create_admin;
@@ -36,7 +37,8 @@ class MediaScannerTest extends TestCase
         return realpath($this->mediaPath . $subPath);
     }
 
-    public function testScan(): void
+    #[Test]
+    public function scan(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -46,14 +48,14 @@ class MediaScannerTest extends TestCase
         Event::assertDispatched(MediaScanCompleted::class);
 
         // Standard mp3 files under root path should be recognized
-        self::assertDatabaseHas(Song::class, [
+        $this->assertDatabaseHas(Song::class, [
             'path' => $this->path('/full.mp3'),
             'track' => 5,
             'owner_id' => $owner->id,
         ]);
 
         // Ogg files and audio files in subdirectories should be recognized
-        self::assertDatabaseHas(Song::class, [
+        $this->assertDatabaseHas(Song::class, [
             'path' => $this->path('/subdir/back-in-black.ogg'),
             'owner_id' => $owner->id,
         ]);
@@ -65,20 +67,20 @@ class MediaScannerTest extends TestCase
         self::assertNotEmpty($song->album->cover);
 
         // File search shouldn't be case-sensitive.
-        self::assertDatabaseHas(Song::class, ['path' => $this->path('/subdir/no-name.mp3')]);
+        $this->assertDatabaseHas(Song::class, ['path' => $this->path('/subdir/no-name.mp3')]);
 
         // Non-audio files shouldn't be recognized
-        self::assertDatabaseMissing(Song::class, ['path' => $this->path('/rubbish.log')]);
+        $this->assertDatabaseMissing(Song::class, ['path' => $this->path('/rubbish.log')]);
 
         // Broken/corrupted audio files shouldn't be recognized
-        self::assertDatabaseMissing(Song::class, ['path' => $this->path('/fake.mp3')]);
+        $this->assertDatabaseMissing(Song::class, ['path' => $this->path('/fake.mp3')]);
 
         // Artists should be created
-        self::assertDatabaseHas(Artist::class, ['name' => 'Cuckoo']);
-        self::assertDatabaseHas(Artist::class, ['name' => 'Koel']);
+        $this->assertDatabaseHas(Artist::class, ['name' => 'Cuckoo']);
+        $this->assertDatabaseHas(Artist::class, ['name' => 'Koel']);
 
         // Albums should be created
-        self::assertDatabaseHas(Album::class, ['name' => 'Koel Testing Vol. 1']);
+        $this->assertDatabaseHas(Album::class, ['name' => 'Koel Testing Vol. 1']);
 
         // Albums and artists should be correctly linked
         /** @var Album $album */
@@ -93,7 +95,8 @@ class MediaScannerTest extends TestCase
         self::assertSame('Cuckoo', $song->artist->name);
     }
 
-    public function testModifiedFileIsRescanned(): void
+    #[Test]
+    public function modifiedFileIsRescanned(): void
     {
         $config = ScanConfiguration::make(owner: create_admin());
         $this->scanner->scan($config);
@@ -107,7 +110,8 @@ class MediaScannerTest extends TestCase
         self::assertSame($time, $song->refresh()->mtime);
     }
 
-    public function testRescanWithoutForceDoesNotResetData(): void
+    #[Test]
+    public function rescanWithoutForceDoesNotResetData(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -130,7 +134,8 @@ class MediaScannerTest extends TestCase
         self::assertSame('Booom Wroooom', $song->lyrics);
     }
 
-    public function testForceScanResetsData(): void
+    #[Test]
+    public function forceScanResetsData(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -155,7 +160,8 @@ class MediaScannerTest extends TestCase
         self::assertSame($owner->id, $song->owner_id);
     }
 
-    public function testScanWithIgnoredTags(): void
+    #[Test]
+    public function scanWithIgnoredTags(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -178,7 +184,8 @@ class MediaScannerTest extends TestCase
         self::assertNotSame('Booom Wroooom', $song->lyrics);
     }
 
-    public function testScanAllTagsForNewFilesRegardlessOfIgnoredOption(): void
+    #[Test]
+    public function scanAllTagsForNewFilesRegardlessOfIgnoredOption(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -203,7 +210,8 @@ class MediaScannerTest extends TestCase
         );
     }
 
-    public function testScanAddedSongViaWatch(): void
+    #[Test]
+    public function scanAddedSongViaWatch(): void
     {
         $path = $this->path('/blank.mp3');
 
@@ -212,10 +220,11 @@ class MediaScannerTest extends TestCase
             ScanConfiguration::make(owner: create_admin())
         );
 
-        self::assertDatabaseHas(Song::class, ['path' => $path]);
+        $this->assertDatabaseHas(Song::class, ['path' => $path]);
     }
 
-    public function testScanDeletedSongViaWatch(): void
+    #[Test]
+    public function scanDeletedSongViaWatch(): void
     {
         /** @var Song $song */
         $song = Song::factory()->create();
@@ -225,10 +234,11 @@ class MediaScannerTest extends TestCase
             ScanConfiguration::make(owner: create_admin())
         );
 
-        self::assertModelMissing($song);
+        $this->assertModelMissing($song);
     }
 
-    public function testScanDeletedDirectoryViaWatch(): void
+    #[Test]
+    public function scanDeletedDirectoryViaWatch(): void
     {
         Event::fake(MediaScanCompleted::class);
 
@@ -237,12 +247,13 @@ class MediaScannerTest extends TestCase
         $this->scanner->scan($config);
         $this->scanner->scanWatchRecord(new InotifyWatchRecord("MOVED_FROM,ISDIR $this->mediaPath/subdir"), $config);
 
-        self::assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/sic.mp3')]);
-        self::assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/no-name.mp3')]);
-        self::assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/back-in-black.mp3')]);
+        $this->assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/sic.mp3')]);
+        $this->assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/no-name.mp3')]);
+        $this->assertDatabaseMissing(Song::class, ['path' => $this->path('/subdir/back-in-black.mp3')]);
     }
 
-    public function testHtmlEntities(): void
+    #[Test]
+    public function htmlEntities(): void
     {
         $path = $this->path('/songs/blank.mp3');
         $analyzed = [
@@ -275,16 +286,17 @@ class MediaScannerTest extends TestCase
         self::assertSame('水谷広実', $info->title);
     }
 
-    public function testOptionallyIgnoreHiddenFiles(): void
+    #[Test]
+    public function optionallyIgnoreHiddenFiles(): void
     {
         $config = ScanConfiguration::make(owner: create_admin());
 
         config(['koel.ignore_dot_files' => false]);
         $this->scanner->scan($config);
-        self::assertDatabaseHas(Album::class, ['name' => 'Hidden Album']);
+        $this->assertDatabaseHas(Album::class, ['name' => 'Hidden Album']);
 
         config(['koel.ignore_dot_files' => true]);
         $this->scanner->scan($config);
-        self::assertDatabaseMissing(Album::class, ['name' => 'Hidden Album']);
+        $this->assertDatabaseMissing(Album::class, ['name' => 'Hidden Album']);
     }
 }

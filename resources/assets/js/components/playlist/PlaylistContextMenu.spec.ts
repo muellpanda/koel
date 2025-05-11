@@ -1,12 +1,14 @@
-import Router from '@/router'
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { eventBus } from '@/utils'
 import factory from '@/__tests__/factory'
-import { screen, waitFor } from '@testing-library/vue'
-import { queueStore, songStore, userStore } from '@/stores'
-import { playbackService } from '@/services'
 import { MessageToasterStub } from '@/__tests__/stubs'
+import { screen, waitFor } from '@testing-library/vue'
+import { queueStore } from '@/stores/queueStore'
+import { songStore } from '@/stores/songStore'
+import { userStore } from '@/stores/userStore'
+import { playbackService } from '@/services/playbackService'
+import { eventBus } from '@/utils/eventBus'
+import Router from '@/router'
 import PlaylistContextMenu from './PlaylistContextMenu.vue'
 
 new class extends UnitTestCase {
@@ -54,7 +56,7 @@ new class extends UnitTestCase {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalledWith(playlist)
         expect(queueMock).toHaveBeenCalledWith(songs)
-        expect(goMock).toHaveBeenCalledWith('queue')
+        expect(goMock).toHaveBeenCalledWith('/#/queue')
       })
     })
 
@@ -90,7 +92,7 @@ new class extends UnitTestCase {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalledWith(playlist)
         expect(queueMock).toHaveBeenCalledWith(songs, true)
-        expect(goMock).toHaveBeenCalledWith('queue')
+        expect(goMock).toHaveBeenCalledWith('/#/queue')
       })
     })
 
@@ -133,7 +135,7 @@ new class extends UnitTestCase {
     it('does not have an option to edit or delete if the playlist is not owned by the current user', async () => {
       const user = factory('user')
       const playlist = factory('playlist', {
-        user_id: user.id + 1
+        user_id: user.id + 1,
       })
 
       await this.renderComponent(playlist, user)
@@ -156,7 +158,7 @@ new class extends UnitTestCase {
 
   private async renderComponent (playlist: Playlist, user: User | null = null) {
     userStore.state.current = user || factory('user', {
-      id: playlist.user_id
+      id: playlist.user_id,
     })
 
     this.render(PlaylistContextMenu)

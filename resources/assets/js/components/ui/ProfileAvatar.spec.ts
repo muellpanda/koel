@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
 import ProfileAvatar from './ProfileAvatar.vue'
 
 new class extends UnitTestCase {
@@ -8,7 +8,7 @@ new class extends UnitTestCase {
     it('renders', () => {
       const user = factory('user', {
         name: 'John Doe',
-        avatar: 'https://example.com/avatar.jpg'
+        avatar: 'https://example.com/avatar.jpg',
       })
 
       expect(this.be(user).render(ProfileAvatar).html()).toMatchSnapshot()

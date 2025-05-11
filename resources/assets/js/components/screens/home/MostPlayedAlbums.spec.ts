@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
-import { overviewStore } from '@/stores'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
+import { overviewStore } from '@/stores/overviewStore'
 import MostPlayedAlbums from './MostPlayedAlbums.vue'
 
 new class extends UnitTestCase {
@@ -11,9 +11,9 @@ new class extends UnitTestCase {
       expect(this.render(MostPlayedAlbums, {
         global: {
           stubs: {
-            AlbumCard: this.stub('album-card')
-          }
-        }
+            AlbumCard: this.stub('album-card'),
+          },
+        },
       }).getAllByTestId('album-card')).toHaveLength(6)
     })
   }

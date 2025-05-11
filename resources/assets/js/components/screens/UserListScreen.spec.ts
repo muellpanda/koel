@@ -1,16 +1,16 @@
 import { expect, it } from 'vitest'
+import { screen } from '@testing-library/vue'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { screen } from '@testing-library/vue'
-import { http } from '@/services'
-import { eventBus } from '@/utils'
+import { http } from '@/services/http'
+import { eventBus } from '@/utils/eventBus'
 import Btn from '@/components/ui/form/Btn.vue'
 import BtnGroup from '@/components/ui/form/BtnGroup.vue'
 import UserListScreen from './UserListScreen.vue'
 
 new class extends UnitTestCase {
   protected beforeEach (cb?: Closure) {
-    super.beforeEach(cb);
+    super.beforeEach(cb)
 
     this.beAdmin()
   }
@@ -62,9 +62,9 @@ new class extends UnitTestCase {
         stubs: {
           Btn,
           BtnGroup,
-          UserCard: this.stub('user-card')
-        }
-      }
+          UserCard: this.stub('user-card'),
+        },
+      },
     })
 
     expect(fetchMock).toHaveBeenCalledWith('users')

@@ -9,7 +9,7 @@
         <Icon :icon="faVolumeOff" />
       </template>
       No songs found.
-      <span class="secondary d-block">
+      <span class="secondary block">
         {{ isAdmin ? 'Have you set up your library yet?' : 'Contact your administrator to set up your library.' }}
       </span>
     </ScreenEmptyState>
@@ -37,9 +37,13 @@
 import { faVolumeOff } from '@fortawesome/free-solid-svg-icons'
 import { sample } from 'lodash'
 import { computed, ref } from 'vue'
-import { eventBus } from '@/utils'
-import { commonStore, overviewStore, userStore } from '@/stores'
-import { useAuthorization, useErrorHandler, useRouter } from '@/composables'
+import { eventBus } from '@/utils/eventBus'
+import { commonStore } from '@/stores/commonStore'
+import { overviewStore } from '@/stores/overviewStore'
+import { userStore } from '@/stores/userStore'
+import { useRouter } from '@/composables/useRouter'
+import { useAuthorization } from '@/composables/useAuthorization'
+import { useErrorHandler } from '@/composables/useErrorHandler'
 
 import MostPlayedSongs from '@/components/screens/home/MostPlayedSongs.vue'
 import RecentlyPlayedSongs from '@/components/screens/home/RecentlyPlayedSongs.vue'
@@ -63,7 +67,7 @@ const greetings = [
   'Sup, %s?',
   'How’s life, %s?',
   'How’s your day, %s?',
-  'How have you been, %s?'
+  'How have you been, %s?',
 ]
 
 const greeting = computed(() => userStore.current ? sample(greetings)!.replace('%s', userStore.current.name) : '')

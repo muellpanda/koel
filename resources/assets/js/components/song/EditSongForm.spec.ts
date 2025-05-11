@@ -1,11 +1,13 @@
-import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { arrayify, eventBus } from '@/utils'
-import { ModalContextKey } from '@/symbols'
-import { ref } from 'vue'
 import { screen } from '@testing-library/vue'
-import { songStore, SongUpdateResult } from '@/stores'
+import { ref } from 'vue'
+import { expect, it } from 'vitest'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
+import { arrayify } from '@/utils/helpers'
+import { eventBus } from '@/utils/eventBus'
+import { ModalContextKey } from '@/symbols'
+import type { SongUpdateResult } from '@/stores/songStore'
+import { songStore } from '@/stores/songStore'
 import { MessageToasterStub } from '@/__tests__/stubs'
 import EditSongForm from './EditSongForm.vue'
 
@@ -19,9 +21,9 @@ new class extends UnitTestCase {
         artists: [],
         removed: {
           albums: [],
-          artists: []
+          artists: [],
         },
-        playables: []
+        playables: [],
       }
 
       const updateMock = this.mock(songStore, 'update').mockResolvedValue(result)
@@ -33,7 +35,7 @@ new class extends UnitTestCase {
         artist_name: 'Led Zeppelin',
         album_name: 'IV',
         album_cover: 'http://test/album.jpg',
-        genre: 'Rock'
+        genre: 'Rock',
       }))
 
       expect(html()).toMatchSnapshot()
@@ -59,7 +61,7 @@ new class extends UnitTestCase {
         track: 10,
         disc: 1,
         genre: 'Rock & Roll',
-        year: 1971
+        year: 1971,
       })
 
       expect(alertMock).toHaveBeenCalledWith('Updated 1 song.')
@@ -72,9 +74,9 @@ new class extends UnitTestCase {
         artists: [],
         removed: {
           albums: [],
-          artists: []
+          artists: [],
         },
-        playables: []
+        playables: [],
       }
 
       const updateMock = this.mock(songStore, 'update').mockResolvedValue(result)
@@ -104,7 +106,7 @@ new class extends UnitTestCase {
         track: 10,
         disc: 1,
         genre: 'Pop',
-        year: 1990
+        year: 1990,
       })
 
       expect(alertMock).toHaveBeenCalledWith('Updated 3 songs.')
@@ -116,7 +118,7 @@ new class extends UnitTestCase {
         artist_id: 1000,
         artist_name: 'Led Zeppelin',
         album_id: 1001,
-        album_name: 'IV'
+        album_name: 'IV',
       }))
 
       expect(screen.getByTestId('displayed-artist-name').textContent).toBe('Led Zeppelin')
@@ -132,10 +134,10 @@ new class extends UnitTestCase {
         provide: {
           [<symbol>ModalContextKey]: [ref({
             songs,
-            initialTab
-          })]
-        }
-      }
+            initialTab,
+          })],
+        },
+      },
     })
 
     await this.tick()

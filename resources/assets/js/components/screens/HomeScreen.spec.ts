@@ -1,9 +1,10 @@
+import { screen } from '@testing-library/vue'
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore, overviewStore } from '@/stores'
-import { Events } from '@/config'
-import { eventBus } from '@/utils'
-import { screen } from '@testing-library/vue'
+import { commonStore } from '@/stores/commonStore'
+import { overviewStore } from '@/stores/overviewStore'
+import type { Events } from '@/config/events'
+import { eventBus } from '@/utils/eventBus'
 import HomeScreen from './HomeScreen.vue'
 
 new class extends UnitTestCase {
@@ -31,14 +32,14 @@ new class extends UnitTestCase {
         'recently-added-albums',
         'recently-added-songs',
         'most-played-artists',
-        'most-played-albums'
+        'most-played-albums',
       ].forEach(id => screen.getByTestId(id))
 
       expect(screen.queryByTestId('screen-empty-state')).toBeNull()
     })
 
     it.each<[keyof Events]>([['SONGS_UPDATED'], ['SONGS_DELETED'], ['SONG_UPLOADED']])
-    ('refreshes the overviews on %s event', async eventName => {
+    ('refreshes the overviews on %s event', async eventName => { // eslint-disable-line no-unexpected-multiline
       const fetchOverviewMock = this.mock(overviewStore, 'fetch')
       await this.renderComponent()
 

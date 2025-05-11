@@ -1,11 +1,13 @@
-import Router from '@/router'
 import { screen, waitFor } from '@testing-library/vue'
 import { expect, it } from 'vitest'
 import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { albumStore, commonStore, songStore } from '@/stores'
-import { downloadService } from '@/services'
-import { eventBus } from '@/utils'
+import { albumStore } from '@/stores/albumStore'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
+import { downloadService } from '@/services/downloadService'
+import { eventBus } from '@/utils/eventBus'
+import Router from '@/router'
 import AlbumScreen from './AlbumScreen.vue'
 
 let album: Album
@@ -26,11 +28,19 @@ new class extends UnitTestCase {
       const byIdMock = this.mock(albumStore, 'byId', null)
       await this.renderComponent()
 
-      eventBus.emit('SONGS_UPDATED')
+      eventBus.emit('SONGS_UPDATED', {
+        songs: [],
+        artists: [],
+        albums: [],
+        removed: {
+          albums: [],
+          artists: [],
+        },
+      })
 
       await waitFor(() => {
         expect(byIdMock).toHaveBeenCalledWith(album.id)
-        expect(goMock).toHaveBeenCalledWith('albums')
+        expect(goMock).toHaveBeenCalledWith('/#/albums')
       })
     })
 
@@ -61,7 +71,7 @@ new class extends UnitTestCase {
       id: 42,
       name: 'Led Zeppelin IV',
       artist_id: 123,
-      artist_name: 'Led Zeppelin'
+      artist_name: 'Led Zeppelin',
     })
 
     const resolveAlbumMock = this.mock(albumStore, 'resolve').mockResolvedValue(album)
@@ -71,7 +81,7 @@ new class extends UnitTestCase {
 
     await this.router.activateRoute({
       path: 'albums/42',
-      screen: 'Album'
+      screen: 'Album',
     }, { id: '42' })
 
     this.render(AlbumScreen, {
@@ -79,9 +89,9 @@ new class extends UnitTestCase {
         stubs: {
           SongList: this.stub('song-list'),
           AlbumCard: this.stub('album-card'),
-          AlbumInfo: this.stub('album-info')
-        }
-      }
+          AlbumInfo: this.stub('album-info'),
+        },
+      },
     })
 
     await waitFor(() => {

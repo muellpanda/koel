@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest'
-import UnitTestCase from '@/__tests__/UnitTestCase'
 import { screen } from '@testing-library/vue'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import { eventBus } from '@/utils/eventBus'
 import Component from './SidebarItem.vue'
-import { eventBus } from '@/utils'
 
 new class extends UnitTestCase {
   protected test () {
@@ -14,7 +14,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         screen: 'Home',
-        path: '_'
+        path: '_',
       })
 
       expect(screen.getByTestId('sidebar-item').classList.contains('current')).toBe(true)
@@ -34,11 +34,11 @@ new class extends UnitTestCase {
       props: {
         icon: faHome,
         href: '#',
-        screen: 'Home'
+        screen: 'Home',
       },
       slots: {
-        default: 'Home'
-      }
+        default: 'Home',
+      },
     })
   }
 }

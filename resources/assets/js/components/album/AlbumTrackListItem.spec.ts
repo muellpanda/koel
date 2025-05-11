@@ -1,11 +1,11 @@
+import { ref } from 'vue'
 import { screen } from '@testing-library/vue'
 import { expect, it } from 'vitest'
 import factory from '@/__tests__/factory'
-import { songStore } from '@/stores'
-import { playbackService } from '@/services'
 import UnitTestCase from '@/__tests__/UnitTestCase'
+import { songStore } from '@/stores/songStore'
+import { playbackService } from '@/services/playbackService'
 import { PlayablesKey } from '@/symbols'
-import { ref } from 'vue'
 import AlbumTrackListItem from './AlbumTrackListItem.vue'
 
 new class extends UnitTestCase {
@@ -30,7 +30,7 @@ new class extends UnitTestCase {
 
     const track = factory('album-track', {
       title: 'Fahrstuhl to Heaven',
-      length: 280
+      length: 280,
     })
 
     const matchMock = this.mock(songStore, 'match', matchedSong)
@@ -38,13 +38,13 @@ new class extends UnitTestCase {
     const rendered = this.render(AlbumTrackListItem, {
       props: {
         album,
-        track
+        track,
       },
       global: {
         provide: {
-          [<symbol>PlayablesKey]: ref(songsToMatchAgainst)
-        }
-      }
+          [<symbol>PlayablesKey]: ref(songsToMatchAgainst),
+        },
+      },
     })
 
     expect(matchMock).toHaveBeenCalledWith('Fahrstuhl to Heaven', songsToMatchAgainst)

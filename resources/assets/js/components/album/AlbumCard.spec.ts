@@ -1,10 +1,12 @@
 import { screen } from '@testing-library/vue'
 import { expect, it } from 'vitest'
-import { downloadService, playbackService } from '@/services'
 import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore, songStore } from '@/stores'
-import { eventBus } from '@/utils'
+import { downloadService } from '@/services/downloadService'
+import { playbackService } from '@/services/playbackService'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
+import { eventBus } from '@/utils/eventBus'
 import AlbumCard from './AlbumCard.vue'
 
 let album: Album
@@ -56,18 +58,18 @@ new class extends UnitTestCase {
       id: 42,
       name: 'IV',
       artist_id: 17,
-      artist_name: 'Led Zeppelin'
+      artist_name: 'Led Zeppelin',
     })
 
     return this.render(AlbumCard, {
       props: {
-        album
+        album,
       },
       global: {
         stubs: {
-          AlbumArtistThumbnail: this.stub('thumbnail')
-        }
-      }
+          AlbumArtistThumbnail: this.stub('thumbnail'),
+        },
+      },
     })
   }
 }

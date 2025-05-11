@@ -1,8 +1,10 @@
-import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { albumStore, commonStore, preferenceStore } from '@/stores'
 import { screen, waitFor } from '@testing-library/vue'
+import { expect, it } from 'vitest'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
+import { albumStore } from '@/stores/albumStore'
+import { commonStore } from '@/stores/commonStore'
+import { preferenceStore } from '@/stores/preferenceStore'
 import AlbumListScreen from './AlbumListScreen.vue'
 
 new class extends UnitTestCase {
@@ -23,7 +25,7 @@ new class extends UnitTestCase {
       await waitFor(() => screen.getByTestId('screen-empty-state'))
     })
 
-    it.each<[ArtistAlbumViewMode]>([['list'], ['thumbnails']])('sets layout from preferences', async (mode) => {
+    it.each<[ArtistAlbumViewMode]>([['list'], ['thumbnails']])('sets layout from preferences', async mode => {
       preferenceStore.albums_view_mode = mode
 
       await this.renderComponent()
@@ -48,9 +50,9 @@ new class extends UnitTestCase {
     this.render(AlbumListScreen, {
       global: {
         stubs: {
-          AlbumCard: this.stub('album-card')
-        }
-      }
+          AlbumCard: this.stub('album-card'),
+        },
+      },
     })
 
     await this.router.activateRoute({ path: 'albums', screen: 'Albums' })

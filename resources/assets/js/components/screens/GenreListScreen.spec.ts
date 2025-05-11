@@ -1,8 +1,9 @@
 import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore, genreStore } from '@/stores'
 import { screen, waitFor } from '@testing-library/vue'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
+import { commonStore } from '@/stores/commonStore'
+import { genreStore } from '@/stores/genreStore'
 import GenreListScreen from './GenreListScreen.vue'
 
 new class extends UnitTestCase {
@@ -12,7 +13,7 @@ new class extends UnitTestCase {
       const genres = [
         factory('genre', { name: 'Rock', song_count: 10 }),
         factory('genre', { name: 'Pop', song_count: 20 }),
-        factory('genre', { name: 'Jazz', song_count: 30 })
+        factory('genre', { name: 'Jazz', song_count: 30 }),
       ]
 
       const fetchMock = this.mock(genreStore, 'fetchAll').mockResolvedValue(genres)

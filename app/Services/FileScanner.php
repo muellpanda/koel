@@ -12,8 +12,10 @@ use App\Values\SongScanInformation;
 use getID3;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Throwable;
 
 class FileScanner
 {
@@ -66,42 +68,50 @@ class FileScanner
 
     public function scan(ScanConfiguration $config): ScanResult
     {
-        if (!$this->isFileNewOrChanged() && !$config->force) {
-            return ScanResult::skipped($this->filePath);
+        try {
+            if (!$config->force && !$this->isFileNewOrChanged()) {
+                return ScanResult::skipped($this->filePath);
+            }
+
+            $info = $this->getScanInformation()?->toArray();
+
+            if (!$info) {
+                return ScanResult::error($this->filePath, $this->syncError);
+            }
+
+            if (!$this->isFileNew()) {
+                Arr::forget($info, $config->ignores);
+            }
+
+            /** @var Artist $artist */
+            $artist = Arr::get($info, 'artist') ? Artist::getOrCreate($info['artist']) : $this->song->artist;
+
+            $albumArtist = Arr::get($info, 'albumartist') ? Artist::getOrCreate($info['albumartist']) : $artist;
+
+            /** @var Album $album */
+            $album = Arr::get($info, 'album') ? Album::getOrCreate($albumArtist, $info['album']) : $this->song->album;
+
+            if (!$album->has_cover && !in_array('cover', $config->ignores, true)) {
+                $this->tryGenerateAlbumCover($album, Arr::get($info, 'cover', []));
+            }
+
+            $data = Arr::except($info, ['album', 'artist', 'albumartist', 'cover']);
+            $data['album_id'] = $album->id;
+            $data['artist_id'] = $artist->id;
+            $data['is_public'] = $config->makePublic;
+
+            if ($this->isFileNew()) {
+                // Only set the owner if the song is new i.e. don't override the owner if the song is being updated.
+                $data['owner_id'] = $config->owner->id;
+            }
+
+            // @todo Decouple song creation from scanning.
+            $this->song = Song::query()->updateOrCreate(['path' => $this->filePath], $data); // @phpstan-ignore-line
+
+            return ScanResult::success($this->filePath);
+        } catch (Throwable) {
+            return ScanResult::error($this->filePath, 'Possible invalid file');
         }
-
-        $info = $this->getScanInformation()?->toArray();
-
-        if (!$info) {
-            return ScanResult::error($this->filePath, $this->syncError);
-        }
-
-        if (!$this->isFileNew()) {
-            Arr::forget($info, $config->ignores);
-        }
-
-        $artist = Arr::get($info, 'artist') ? Artist::getOrCreate($info['artist']) : $this->song->artist;
-        $albumArtist = Arr::get($info, 'albumartist') ? Artist::getOrCreate($info['albumartist']) : $artist;
-        $album = Arr::get($info, 'album') ? Album::getOrCreate($albumArtist, $info['album']) : $this->song->album;
-
-        if (!in_array('cover', $config->ignores, true) && !$album->has_cover) {
-            $this->tryGenerateAlbumCover($album, Arr::get($info, 'cover', []));
-        }
-
-        $data = Arr::except($info, ['album', 'artist', 'albumartist', 'cover']);
-        $data['album_id'] = $album->id;
-        $data['artist_id'] = $artist->id;
-        $data['is_public'] = $config->makePublic;
-
-        if ($this->isFileNew()) {
-            // Only set the owner if the song is new i.e. don't override the owner if the song is being updated.
-            $data['owner_id'] = $config->owner->id;
-        }
-
-        // @todo Decouple song creation from scanning.
-        $this->song = Song::query()->updateOrCreate(['path' => $this->filePath], $data); // @phpstan-ignore-line
-
-        return ScanResult::success($this->filePath);
     }
 
     /**
@@ -111,7 +121,7 @@ class FileScanner
      */
     private function tryGenerateAlbumCover(Album $album, ?array $coverData): void
     {
-        attempt(function () use ($album, $coverData): void {
+        rescue(function () use ($album, $coverData): void {
             // If the album has no cover, we try to get the cover image from existing tag data
             if ($coverData) {
                 $this->mediaMetadataService->writeAlbumCover($album, $coverData['data']);
@@ -120,12 +130,10 @@ class FileScanner
             }
 
             // Or, if there's a cover image under the same directory, use it.
-            $cover = $this->getCoverFileUnderSameDirectory();
-
-            if ($cover) {
+            optional($this->getCoverFileUnderSameDirectory(), function (string $cover) use ($album): void {
                 $this->mediaMetadataService->writeAlbumCover($album, $cover);
-            }
-        }, false);
+            });
+        });
     }
 
     /**
@@ -139,7 +147,7 @@ class FileScanner
         return Cache::remember(md5($this->filePath . '_cover'), now()->addDay(), function (): ?string {
             $matches = array_keys(
                 iterator_to_array(
-                    $this->finder->create()
+                    $this->finder::create()
                         ->depth(0)
                         ->ignoreUnreadableDirs()
                         ->files()
@@ -149,7 +157,7 @@ class FileScanner
                 )
             );
 
-            $cover = $matches ? $matches[0] : null;
+            $cover = $matches[0] ?? null;
 
             return $cover && self::isImage($cover) ? $cover : null;
         });
@@ -157,7 +165,7 @@ class FileScanner
 
     private static function isImage(string $path): bool
     {
-        return attempt(static fn () => (bool) exif_imagetype($path)) ?? false;
+        return rescue(static fn () => (bool) exif_imagetype($path)) ?? false;
     }
 
     /**
@@ -181,8 +189,12 @@ class FileScanner
         return $this->isFileNew() || $this->isFileChanged();
     }
 
-    public function getSong(): ?Song
+    public function getSong(): Song
     {
+        if (!$this->song) {
+            throw new RuntimeException('No song model is available.');
+        }
+
         return $this->song;
     }
 }

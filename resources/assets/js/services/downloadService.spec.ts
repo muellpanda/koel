@@ -1,7 +1,7 @@
-import { favoriteStore } from '@/stores'
-import factory from '@/__tests__/factory'
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
+import { favoriteStore } from '@/stores/favoriteStore'
 import { downloadService } from './downloadService'
 
 new class extends UnitTestCase {
@@ -45,6 +45,7 @@ new class extends UnitTestCase {
         downloadService.fromFavorites()
 
         triggered ? expect(mock).toHaveBeenCalledWith('favorites') : expect(mock).not.toHaveBeenCalled()
-      })
+      },
+    )
   }
 }

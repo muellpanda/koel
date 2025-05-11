@@ -1,8 +1,8 @@
 import { expect, it } from 'vitest'
-import UnitTestCase from '@/__tests__/UnitTestCase'
 import { screen, waitFor } from '@testing-library/vue'
-import { userStore } from '@/stores'
+import UnitTestCase from '@/__tests__/UnitTestCase'
 import { MessageToasterStub } from '@/__tests__/stubs'
+import { userStore } from '@/stores/userStore'
 import AddUserForm from './AddUserForm.vue'
 
 new class extends UnitTestCase {
@@ -24,7 +24,7 @@ new class extends UnitTestCase {
           name: 'John Doe',
           email: 'john@doe.com',
           password: 'secret-password',
-          is_admin: true
+          is_admin: true,
         })
 
         expect(alertMock).toHaveBeenCalledWith('New user "John Doe" created.')

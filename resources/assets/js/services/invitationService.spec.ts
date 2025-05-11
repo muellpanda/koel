@@ -1,8 +1,9 @@
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { authService, http } from '@/services'
-import { userStore } from '@/stores'
+import { authService } from '@/services/authService'
+import { http } from '@/services/http'
+import { userStore } from '@/stores/userStore'
 import { invitationService } from './invitationService'
 
 new class extends UnitTestCase {
@@ -10,7 +11,7 @@ new class extends UnitTestCase {
     it('accepts an invitation', async () => {
       const postMock = this.mock(http, 'post').mockResolvedValue({
         'audio-token': 'my-audio-token',
-        token: 'my-token',
+        'token': 'my-token',
       })
 
       const setAudioTokenMock = this.mock(authService, 'setAudioToken')

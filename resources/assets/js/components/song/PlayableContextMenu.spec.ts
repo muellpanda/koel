@@ -1,12 +1,17 @@
-import Router from '@/router'
 import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { arrayify, eventBus } from '@/utils'
+import factory from '@/__tests__/factory'
+import { arrayify } from '@/utils/helpers'
+import { eventBus } from '@/utils/eventBus'
 import { screen, waitFor } from '@testing-library/vue'
-import { downloadService, playbackService } from '@/services'
-import { favoriteStore, playlistStore, queueStore, songStore } from '@/stores'
+import { downloadService } from '@/services/downloadService'
+import { playbackService } from '@/services/playbackService'
+import { favoriteStore } from '@/stores/favoriteStore'
+import { playlistStore } from '@/stores/playlistStore'
+import { queueStore } from '@/stores/queueStore'
+import { songStore } from '@/stores/songStore'
 import { DialogBoxStub, MessageToasterStub } from '@/__tests__/stubs'
+import Router from '@/router'
 import Component from './PlayableContextMenu.vue'
 
 let playables: Playable[]
@@ -52,7 +57,7 @@ new class extends UnitTestCase {
 
       await this.user.click(screen.getByText('Go to Album'))
 
-      expect(goMock).toHaveBeenCalledWith(`album/${song.album_id}`)
+      expect(goMock).toHaveBeenCalledWith(`/#/albums/${song.album_id}`)
     })
 
     it('goes to artist details screen', async () => {
@@ -62,7 +67,7 @@ new class extends UnitTestCase {
 
       await this.user.click(screen.getByText('Go to Artist'))
 
-      expect(goMock).toHaveBeenCalledWith(`artist/${song.artist_id}`)
+      expect(goMock).toHaveBeenCalledWith(`/#/artists/${song.artist_id}`)
     })
 
     it('downloads', async () => {
@@ -119,7 +124,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         path: '/queue',
-        screen: 'Queue'
+        screen: 'Queue',
       })
 
       await this.renderComponent()
@@ -134,7 +139,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         path: '/songs',
-        screen: 'Songs'
+        screen: 'Songs',
       })
 
       await this.renderComponent()
@@ -154,7 +159,7 @@ new class extends UnitTestCase {
     it('does not have an option to add to favorites for Favorites screen', async () => {
       await this.router.activateRoute({
         path: '/favorites',
-        screen: 'Favorites'
+        screen: 'Favorites',
       })
 
       await this.renderComponent()
@@ -167,7 +172,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         path: '/favorites',
-        screen: 'Favorites'
+        screen: 'Favorites',
       })
 
       await this.renderComponent()
@@ -205,7 +210,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         path: `/playlists/${playlist.id}`,
-        screen: 'Playlist'
+        screen: 'Playlist',
       }, { id: String(playlist.id) })
 
       await this.renderComponent()
@@ -224,7 +229,7 @@ new class extends UnitTestCase {
     it('does not have an option to remove from playlist if not on Playlist screen', async () => {
       await this.router.activateRoute({
         path: '/songs',
-        screen: 'Songs'
+        screen: 'Songs',
       })
 
       await this.renderComponent()
@@ -300,13 +305,19 @@ new class extends UnitTestCase {
       expect(emitMock).toHaveBeenCalledWith('MODAL_SHOW_CREATE_PLAYLIST_FORM', null, playables)
     })
 
+    it('does not have the options to mark song as private or public in Community edition', async () => {
+      await this.renderComponent(factory('song'))
+      expect(screen.queryByText('Mark as Private')).toBeNull()
+      expect(screen.queryByText('Unmark as Private')).toBeNull()
+    })
+
     it('makes songs private', async () => {
       this.enablePlusEdition()
 
       const user = factory('user')
       const songs = factory('song', 5, {
         is_public: true,
-        owner_id: user.id
+        owner_id: user.id,
       })
 
       await this.be(user).renderComponent(songs)
@@ -323,7 +334,7 @@ new class extends UnitTestCase {
       const user = factory('user')
       const songs = factory('song', 5, {
         is_public: false,
-        owner_id: user.id
+        owner_id: user.id,
       })
 
       await this.be(user).renderComponent(songs)
@@ -341,7 +352,7 @@ new class extends UnitTestCase {
       const owner = factory('user')
       const songs = factory('song', 5, {
         is_public: false,
-        owner_id: owner.id
+        owner_id: owner.id,
       })
 
       await this.be(user).renderComponent(songs)
@@ -356,10 +367,10 @@ new class extends UnitTestCase {
       const owner = factory('user')
       const songs = factory('song', 2, {
         is_public: false,
-        owner_id: owner.id
+        owner_id: owner.id,
       }).concat(...factory('song', 3, {
         is_public: true,
-        owner_id: owner.id
+        owner_id: owner.id,
       }))
 
       await this.be(owner).renderComponent(songs)
@@ -372,7 +383,7 @@ new class extends UnitTestCase {
       const owner = factory('user')
       const songs = factory('song', 5, {
         is_public: false,
-        owner_id: owner.id
+        owner_id: owner.id,
       })
 
       await this.be(owner).renderComponent(songs)

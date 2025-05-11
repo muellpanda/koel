@@ -1,11 +1,11 @@
 import { ref } from 'vue'
-import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { ModalContextKey } from '@/symbols'
 import { screen, waitFor } from '@testing-library/vue'
-import { userStore } from '@/stores'
+import { expect, it } from 'vitest'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
 import { MessageToasterStub } from '@/__tests__/stubs'
+import { ModalContextKey } from '@/symbols'
+import { userStore } from '@/stores/userStore'
 import EditUserForm from './EditUserForm.vue'
 
 new class extends UnitTestCase {
@@ -19,9 +19,9 @@ new class extends UnitTestCase {
       this.render(EditUserForm, {
         global: {
           provide: {
-            [<symbol>ModalContextKey]: [ref({ user })]
-          }
-        }
+            [<symbol>ModalContextKey]: [ref({ user })],
+          },
+        },
       })
 
       await this.type(screen.getByRole('textbox', { name: 'Name' }), 'Jane Doe')
@@ -33,7 +33,7 @@ new class extends UnitTestCase {
           name: 'Jane Doe',
           email: user.value.email,
           is_admin: user.value.is_admin,
-          password: 'new-password-duck'
+          password: 'new-password-duck',
         })
 
         expect(alertMock).toHaveBeenCalledWith('User profile updated.')

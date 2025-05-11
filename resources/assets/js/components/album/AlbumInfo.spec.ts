@@ -2,15 +2,15 @@ import { screen } from '@testing-library/vue'
 import { expect, it } from 'vitest'
 import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore } from '@/stores'
-import { mediaInfoService } from '@/services'
+import { commonStore } from '@/stores/commonStore'
+import { mediaInfoService } from '@/services/mediaInfoService'
 import AlbumInfoComponent from './AlbumInfo.vue'
 
 let album: Album
 
 new class extends UnitTestCase {
   protected test () {
-    it.each<[MediaInfoDisplayMode]>([['aside'], ['full']])('renders in %s mode', async (mode) => {
+    it.each<[MediaInfoDisplayMode]>([['aside'], ['full']])('renders in %s mode', async mode => {
       await this.renderComponent(mode)
 
       screen.getByTestId('album-info-tracks')
@@ -38,14 +38,14 @@ new class extends UnitTestCase {
     const rendered = this.render(AlbumInfoComponent, {
       props: {
         album,
-        mode
+        mode,
       },
       global: {
         stubs: {
           TrackList: this.stub(),
-          AlbumThumbnail: this.stub('thumbnail')
-        }
-      }
+          AlbumThumbnail: this.stub('thumbnail'),
+        },
+      },
     })
 
     await this.tick(1)

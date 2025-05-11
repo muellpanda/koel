@@ -1,16 +1,16 @@
 import { expect, it } from 'vitest'
+import { screen } from '@testing-library/vue'
 import factory from '@/__tests__/factory'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore } from '@/stores'
-import { screen } from '@testing-library/vue'
-import { mediaInfoService } from '@/services'
+import { commonStore } from '@/stores/commonStore'
+import { mediaInfoService } from '@/services/mediaInfoService'
 import ArtistInfoComponent from './ArtistInfo.vue'
 
 let artist: Artist
 
 new class extends UnitTestCase {
   protected test () {
-    it.each<[MediaInfoDisplayMode]>([['aside'], ['full']])('renders in %s mode', async (mode) => {
+    it.each<[MediaInfoDisplayMode]>([['aside'], ['full']])('renders in %s mode', async mode => {
       await this.renderComponent(mode)
 
       if (mode === 'aside') {
@@ -33,13 +33,13 @@ new class extends UnitTestCase {
     const rendered = this.render(ArtistInfoComponent, {
       props: {
         artist,
-        mode
+        mode,
       },
       global: {
         stubs: {
-          ArtistThumbnail: this.stub('thumbnail')
-        }
-      }
+          ArtistThumbnail: this.stub('thumbnail'),
+        },
+      },
     })
 
     await this.tick(1)

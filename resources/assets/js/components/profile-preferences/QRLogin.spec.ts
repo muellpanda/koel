@@ -1,13 +1,13 @@
 import { expect, it, vi } from 'vitest'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { authService } from '@/services'
 import { screen } from '@testing-library/vue'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import { authService } from '@/services/authService'
 import Component from './QRLogin.vue'
 
 new class extends UnitTestCase {
   protected beforeEach () {
     vi.mock('@vueuse/integrations/useQRCode', () => ({
-      useQRCode: () => 'data:image/png;base64,my-qr-code'
+      useQRCode: () => 'data:image/png;base64,my-qr-code',
     }))
   }
 

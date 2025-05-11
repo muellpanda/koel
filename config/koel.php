@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'storage_driver' => env('STORAGE_DRIVER', 'local'),
+    'storage_driver' => env('STORAGE_DRIVER', 'local') ?: 'local',
 
     'media_path' => env('MEDIA_PATH'),
 
@@ -79,10 +79,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Last.FM Integration
+    | Spotify Integration
     |--------------------------------------------------------------------------
     |
-    | See wiki on how to integrate with Last.FM
+    | Spotify Integration requires client ID and secret.
     |
     */
 
@@ -155,4 +155,7 @@ return [
         'sponsor_open_collective_url' => 'https://opencollective.com/koel',
         'demo' => env('KOEL_DEMO', false),
     ],
+
+    'supported_formats' => ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'opus', 'aiff'],
+    'transcode_required_formats' => ['aiff'],
 ];

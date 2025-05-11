@@ -1,11 +1,13 @@
 import { screen } from '@testing-library/vue'
 import { expect, it } from 'vitest'
 import factory from '@/__tests__/factory'
-import { downloadService, playbackService } from '@/services'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { commonStore, songStore } from '@/stores'
+import { downloadService } from '@/services/downloadService'
+import { playbackService } from '@/services/playbackService'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
+import { eventBus } from '@/utils/eventBus'
 import ArtistCard from './ArtistCard.vue'
-import { eventBus } from '@/utils'
 
 let artist: Artist
 
@@ -14,7 +16,7 @@ new class extends UnitTestCase {
     super.beforeEach(() => {
       artist = factory('artist', {
         id: 42,
-        name: 'Led Zeppelin'
+        name: 'Led Zeppelin',
       })
     })
   }
@@ -63,13 +65,13 @@ new class extends UnitTestCase {
   private renderComponent () {
     return this.render(ArtistCard, {
       props: {
-        artist
+        artist,
       },
       global: {
         stubs: {
-          AlbumArtistThumbnail: this.stub('thumbnail')
-        }
-      }
+          AlbumArtistThumbnail: this.stub('thumbnail'),
+        },
+      },
     })
   }
 }

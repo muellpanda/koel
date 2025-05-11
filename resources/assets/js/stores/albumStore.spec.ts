@@ -1,8 +1,9 @@
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { http } from '@/services'
-import { albumStore, songStore } from '.'
+import { http } from '@/services/http'
+import { songStore } from '@/stores/songStore'
+import { albumStore } from '@/stores/albumStore'
 
 new class extends UnitTestCase {
   protected beforeEach () {
@@ -96,11 +97,11 @@ new class extends UnitTestCase {
       this.mock(http, 'get').mockResolvedValueOnce({
         data: albums,
         links: {
-          next: '/albums?page=2'
+          next: '/albums?page=2',
         },
         meta: {
-          current_page: 1
-        }
+          current_page: 1,
+        },
       })
 
       expect(await albumStore.paginate(1)).toEqual(2)

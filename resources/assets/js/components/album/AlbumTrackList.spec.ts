@@ -2,8 +2,8 @@ import { screen } from '@testing-library/vue'
 import factory from '@/__tests__/factory'
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
+import { songStore } from '@/stores/songStore'
 import AlbumTrackList from './AlbumTrackList.vue'
-import { songStore } from '@/stores'
 
 new class extends UnitTestCase {
   protected test () {
@@ -14,8 +14,8 @@ new class extends UnitTestCase {
       this.render(AlbumTrackList, {
         props: {
           album,
-          tracks: factory('album-track', 3)
-        }
+          tracks: factory('album-track', 3),
+        },
       })
 
       await this.tick()

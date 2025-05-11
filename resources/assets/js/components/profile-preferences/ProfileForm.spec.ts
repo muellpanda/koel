@@ -1,10 +1,10 @@
-import factory from 'factoria'
 import { expect, it } from 'vitest'
 import { screen } from '@testing-library/vue'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { authService } from '@/services'
+import factory from '@/__tests__/factory'
 import { MessageToasterStub } from '@/__tests__/stubs'
-import ProfileForm from './ProfileForm.vue'
+import { authService } from '@/services/authService'
+import Component from './ProfileForm.vue'
 
 new class extends UnitTestCase {
   protected test () {
@@ -13,7 +13,7 @@ new class extends UnitTestCase {
       const alertMock = this.mock(MessageToasterStub.value, 'success')
 
       this.renderComponent(factory('user', {
-        avatar: 'https://gravatar.com/foo'
+        avatar: 'https://gravatar.com/foo',
       }))
 
       await this.type(screen.getByTestId('currentPassword'), 'old-password')
@@ -27,7 +27,7 @@ new class extends UnitTestCase {
         email: 'koel@example.com',
         current_password: 'old-password',
         new_password: 'new-password',
-        avatar: 'https://gravatar.com/foo'
+        avatar: 'https://gravatar.com/foo',
       })
 
       expect(alertMock).toHaveBeenCalledWith('Profile updated.')
@@ -35,6 +35,6 @@ new class extends UnitTestCase {
   }
 
   private renderComponent (user: User) {
-    return this.be(user).render(ProfileForm)
+    return this.be(user).render(Component)
   }
 }

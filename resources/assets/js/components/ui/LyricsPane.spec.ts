@@ -1,8 +1,8 @@
 import { expect, it } from 'vitest'
+import { screen } from '@testing-library/vue'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { eventBus } from '@/utils'
-import { screen } from '@testing-library/vue'
+import { eventBus } from '@/utils/eventBus'
 import LyricsPane from './LyricsPane.vue'
 import Magnifier from '@/components/ui/Magnifier.vue'
 
@@ -29,18 +29,18 @@ new class extends UnitTestCase {
 
   private renderComponent (song?: Song) {
     song = song || factory('song', {
-      lyrics: 'Foo bar baz qux'
+      lyrics: 'Foo bar baz qux',
     })
 
     return this.render(LyricsPane, {
       props: {
-        song
+        song,
       },
       global: {
         stubs: {
-          Magnifier
-        }
-      }
+          Magnifier,
+        },
+      },
     })
   }
 }

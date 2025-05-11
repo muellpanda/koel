@@ -1,9 +1,9 @@
-import { expect, it } from 'vitest'
-import factory from '@/__tests__/factory'
-import UnitTestCase from '@/__tests__/UnitTestCase'
-import { playbackService } from '@/services'
 import { screen } from '@testing-library/vue'
-import { queueStore } from '@/stores'
+import { expect, it } from 'vitest'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import factory from '@/__tests__/factory'
+import { playbackService } from '@/services/playbackService'
+import { queueStore } from '@/stores/queueStore'
 import Component from './SongThumbnail.vue'
 
 let playable: Playable
@@ -13,7 +13,7 @@ new class extends UnitTestCase {
     it.each<[PlaybackState, MethodOf<typeof playbackService>]>([
       ['Stopped', 'play'],
       ['Playing', 'pause'],
-      ['Paused', 'resume']
+      ['Paused', 'resume'],
     ])('if state is currently "%s", %ss', async (state, method) => {
       this.mock(queueStore, 'queueIfNotQueued')
       const playbackMock = this.mock(playbackService, method)
@@ -29,13 +29,13 @@ new class extends UnitTestCase {
     playable = factory('song', {
       playback_state: playbackState,
       play_count: 10,
-      title: 'Foo bar'
+      title: 'Foo bar',
     })
 
     return this.render(Component, {
       props: {
-        playable
-      }
+        playable,
+      },
     })
   }
 }

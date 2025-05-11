@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { cache, http } from '@/services'
+import { cache } from '@/services/cache'
+import { http } from '@/services/http'
 import { playlistCollaborationService as service } from './playlistCollaborationService'
 
 new class extends UnitTestCase {
@@ -51,7 +52,7 @@ new class extends UnitTestCase {
 
       expect(deleteMock).toHaveBeenCalledWith(`playlists/${playlist.id}/collaborators`, {
         collaborator:
-        collaborator.id
+        collaborator.id,
       })
 
       expect(removeCacheMock).toHaveBeenCalledWith(['playlist.songs', playlist.id])

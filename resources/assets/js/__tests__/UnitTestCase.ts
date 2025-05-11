@@ -1,18 +1,19 @@
 import isMobile from 'ismobilejs'
 import { isObject, mergeWith } from 'lodash'
-import { cleanup, createEvent, fireEvent, render, RenderOptions } from '@testing-library/vue'
+import type { RenderOptions } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
+import type { UserEvent } from '@testing-library/user-event/dist/types/setup/setup'
+import type { EventType } from '@testing-library/dom/types/events'
+import { cleanup, createEvent, fireEvent, render } from '@testing-library/vue'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { defineComponent, nextTick } from 'vue'
-import { commonStore, userStore } from '@/stores'
-import { http } from '@/services'
 import factory from '@/__tests__/factory'
-import { DialogBoxKey, MessageToasterKey, OverlayKey, RouterKey } from '@/symbols'
 import { DialogBoxStub, MessageToasterStub, OverlayStub } from '@/__tests__/stubs'
-import { routes } from '@/config'
+import { commonStore } from '@/stores/commonStore'
+import { userStore } from '@/stores/userStore'
+import { http } from '@/services/http'
+import { DialogBoxKey, MessageToasterKey, OverlayKey, RouterKey } from '@/symbols'
 import Router from '@/router'
-import userEvent from '@testing-library/user-event'
-import { UserEvent } from '@testing-library/user-event/dist/types/setup/setup'
-import { EventType } from '@testing-library/dom/types/events'
 
 // A deep-merge function that
 // - supports symbols as keys (_.merge doesn't)
@@ -20,7 +21,9 @@ import { EventType } from '@testing-library/dom/types/events'
 // Credit: https://stackoverflow.com/a/60598589/794641
 const deepMerge = (first: object, second: object) => {
   return mergeWith(first, second, (a, b) => {
-    if (!isObject(b)) return b
+    if (!isObject(b)) {
+      return b
+    }
 
     // @ts-ignore
     return Array.isArray(a) ? [...a, ...b] : { ...a, ...b }
@@ -28,7 +31,9 @@ const deepMerge = (first: object, second: object) => {
 }
 
 const setPropIfNotExists = (obj: object | null, prop: any, value: any) => {
-  if (!obj) return
+  if (!obj) {
+    return
+  }
 
   if (!Object.prototype.hasOwnProperty.call(obj, prop)) {
     obj[prop] = value
@@ -41,12 +46,12 @@ export default abstract class UnitTestCase {
   private backupMethods = new Map()
 
   public constructor () {
-    this.router = new Router(routes)
+    this.router = new Router()
     this.mock(http, 'request') // prevent actual HTTP requests from being made
     this.user = userEvent.setup({ delay: null }) // @see https://github.com/testing-library/user-event/issues/833
 
     this.setReadOnlyProperty(navigator, 'clipboard', {
-      writeText: vi.fn()
+      writeText: vi.fn(),
     })
 
     this.beforeEach()
@@ -61,7 +66,7 @@ export default abstract class UnitTestCase {
       commonStore.state.uses_i_tunes = true
       commonStore.state.supports_batch_downloading = true
       commonStore.state.supports_transcoding = true
-      cb && cb()
+      cb?.()
     })
   }
 
@@ -72,8 +77,12 @@ export default abstract class UnitTestCase {
       cleanup()
       this.restoreAllMocks()
       this.disablePlusEdition()
-      cb && cb()
+      cb?.()
     })
+  }
+
+  protected auth (user?: User) {
+    return this.be(user)
   }
 
   protected be (user?: User) {
@@ -82,7 +91,6 @@ export default abstract class UnitTestCase {
   }
 
   protected beAdmin () {
-    factory.states('admin')('user')
     return this.be(factory.states('admin')('user'))
   }
 
@@ -113,12 +121,12 @@ export default abstract class UnitTestCase {
           'koel-focus': {},
           'koel-tooltip': {},
           'koel-hide-broken-icon': {},
-          'koel-overflow-fade': {}
+          'koel-overflow-fade': {},
         },
         components: {
-          Icon: this.stub('Icon')
-        }
-      }
+          Icon: this.stub('Icon'),
+        },
+      },
     }, this.supplyRequiredProvides(options)))
   }
 
@@ -148,7 +156,7 @@ export default abstract class UnitTestCase {
 
   protected stub (testId = 'stub') {
     return defineComponent({
-      template: `<br data-testid="${testId}"/>`
+      template: `<br data-testid="${testId}"/>`,
     })
   }
 
@@ -162,8 +170,8 @@ export default abstract class UnitTestCase {
     return Object.defineProperties(obj, {
       [prop]: {
         value,
-        configurable: true
-      }
+        configurable: true,
+      },
     })
   }
 
@@ -172,7 +180,7 @@ export default abstract class UnitTestCase {
     await this.user.type(element, value)
   }
 
-  protected async trigger (element: HTMLElement, key: EventType | string, options?: {}) {
+  protected async trigger (element: HTMLElement, key: EventType | string, options: object = {}) {
     await fireEvent(element, createEvent[key](element, options))
   }
 

@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { screen } from '@testing-library/vue'
-import { youTubeService } from '@/services'
 import UnitTestCase from '@/__tests__/UnitTestCase'
+import { youTubeService } from '@/services/youTubeService'
 import YouTubeVideoItem from './YouTubeVideoItem.vue'
 
 let video: YouTubeVideo
@@ -23,22 +23,22 @@ new class extends UnitTestCase {
   private renderComponent () {
     video = {
       id: {
-        videoId: 'cLgJQ8Zj3AA'
+        videoId: 'cLgJQ8Zj3AA',
       },
       snippet: {
         title: 'Guess what it is',
         description: 'From the LA Opening Gala 2014: John Williams Celebration',
         thumbnails: {
           default: {
-            url: 'https://i.ytimg.com/an_webp/cLgJQ8Zj3AA/mqdefault_6s.webp'
-          }
-        }
-      }
+            url: 'https://i.ytimg.com/an_webp/cLgJQ8Zj3AA/mqdefault_6s.webp',
+          },
+        },
+      },
     }
     return this.render(YouTubeVideoItem, {
       props: {
-        video
-      }
+        video,
+      },
     })
   }
 }

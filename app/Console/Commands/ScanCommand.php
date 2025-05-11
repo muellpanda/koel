@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\ScanEvent;
 use App\Models\Setting;
 use App\Models\User;
 use App\Repositories\UserRepository;
@@ -36,11 +37,11 @@ class ScanCommand extends Command
     ) {
         parent::__construct();
 
-        $this->scanner->on('paths-gathered', function (array $paths): void {
+        $this->scanner->on(ScanEvent::PATHS_GATHERED, function (array $paths): void {
             $this->progressBar = new ProgressBar($this->output, count($paths));
         });
 
-        $this->scanner->on('progress', [$this, 'onScanProgress']);
+        $this->scanner->on(ScanEvent::SCAN_PROGRESS, [$this, 'onScanProgress']);
     }
 
     protected function configure(): void
@@ -173,7 +174,7 @@ class ScanCommand extends Command
                 exit(self::INVALID);
             });
 
-            $this->components->info("Setting owner to $user->name (ID $user->id).");
+            $this->components->info("Setting owner to $user->name (ID {$user->id}).");
 
             return $user;
         }
@@ -181,7 +182,7 @@ class ScanCommand extends Command
         $user = $this->userRepository->getDefaultAdminUser();
 
         $this->components->warn(
-            "No song owner specified. Setting the first admin ($user->name, ID $user->id) as owner."
+            "No song owner specified. Setting the first admin ($user->name, ID {$user->id}) as owner."
         );
 
         return $user;

@@ -1,11 +1,13 @@
 import Router from '@/router'
 import { expect, it } from 'vitest'
+import { screen } from '@testing-library/vue'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { eventBus } from '@/utils'
-import { downloadService, playbackService } from '@/services'
-import { commonStore, songStore } from '@/stores'
-import { screen } from '@testing-library/vue'
+import { eventBus } from '@/utils/eventBus'
+import { downloadService } from '@/services/downloadService'
+import { playbackService } from '@/services/playbackService'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
 import ArtistContextMenu from './ArtistContextMenu.vue'
 
 let artist: Artist
@@ -62,7 +64,7 @@ new class extends UnitTestCase {
 
       await screen.getByText('Go to Artist').click()
 
-      expect(mock).toHaveBeenCalledWith(`artist/${artist.id}`)
+      expect(mock).toHaveBeenCalledWith(`/#/artists/${artist.id}`)
     })
 
     it('does not have an option to download or go to Unknown Artist', async () => {
@@ -82,7 +84,7 @@ new class extends UnitTestCase {
 
   private async renderComponent (_artist?: Artist) {
     artist = _artist || factory('artist', {
-      name: 'Accept'
+      name: 'Accept',
     })
 
     const rendered = this.render(ArtistContextMenu)

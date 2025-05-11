@@ -1,11 +1,11 @@
-import UnitTestCase from '@/__tests__/UnitTestCase'
 import { expect, it } from 'vitest'
 import { screen } from '@testing-library/vue'
-import ThemeCard from './ThemeCard.vue'
+import UnitTestCase from '@/__tests__/UnitTestCase'
+import Component from './ThemeCard.vue'
 
 const theme: Theme = {
   id: 'sample',
-  thumbnailColor: '#f00'
+  thumbnailColor: '#f00',
 }
 
 new class extends UnitTestCase {
@@ -22,10 +22,10 @@ new class extends UnitTestCase {
   }
 
   private renderComponent () {
-    return this.render(ThemeCard, {
+    return this.render(Component, {
       props: {
-        theme
-      }
+        theme,
+      },
     })
   }
 }

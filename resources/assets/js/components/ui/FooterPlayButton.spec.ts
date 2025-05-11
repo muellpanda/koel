@@ -1,12 +1,16 @@
-import Router from '@/router'
-import factory from '@/__tests__/factory'
+import { screen, waitFor } from '@testing-library/vue'
 import { ref } from 'vue'
 import { expect, it } from 'vitest'
 import UnitTestCase from '@/__tests__/UnitTestCase'
-import { playbackService } from '@/services'
-import { screen, waitFor } from '@testing-library/vue'
+import factory from '@/__tests__/factory'
+import { playbackService } from '@/services/playbackService'
 import { CurrentPlayableKey } from '@/symbols'
-import { commonStore, favoriteStore, queueStore, recentlyPlayedStore, songStore } from '@/stores'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
+import { favoriteStore } from '@/stores/favoriteStore'
+import { recentlyPlayedStore } from '@/stores/recentlyPlayedStore'
+import { queueStore } from '@/stores/queueStore'
+import Router from '@/router'
 import FooterPlayButton from './FooterPlayButton.vue'
 
 new class extends UnitTestCase {
@@ -23,7 +27,7 @@ new class extends UnitTestCase {
     it.each<[ScreenName, MethodOf<typeof songStore>, string | number]>([
       ['Album', 'fetchForAlbum', 42],
       ['Artist', 'fetchForArtist', 42],
-      ['Playlist', 'fetchForPlaylist', '71d8cd40-20d4-4b17-b460-d30fe5bb7b66']
+      ['Playlist', 'fetchForPlaylist', '71d8cd40-20d4-4b17-b460-d30fe5bb7b66'],
     ])('initiates playback for %s screen', async (screenName, fetchMethod, id) => {
       commonStore.state.song_count = 10
       const songs = factory('song', 3)
@@ -33,7 +37,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         screen: screenName,
-        path: '_'
+        path: '_',
       }, { id: String(id) })
 
       this.renderComponent()
@@ -42,17 +46,17 @@ new class extends UnitTestCase {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalledWith(id)
         expect(playMock).toHaveBeenCalledWith(songs)
-        expect(goMock).toHaveBeenCalledWith('queue')
+        expect(goMock).toHaveBeenCalledWith('/#/queue')
       })
     })
 
     it.each<[
       ScreenName,
         typeof favoriteStore | typeof recentlyPlayedStore,
-      MethodOf<typeof favoriteStore | typeof recentlyPlayedStore>
+        MethodOf<typeof favoriteStore | typeof recentlyPlayedStore>,
     ]>([
       ['Favorites', favoriteStore, 'fetch'],
-      ['RecentlyPlayed', recentlyPlayedStore, 'fetch']
+      ['RecentlyPlayed', recentlyPlayedStore, 'fetch'],
     ])('initiates playback for %s screen', async (screenName, store, fetchMethod) => {
       commonStore.state.song_count = 10
       const songs = factory('song', 3)
@@ -62,7 +66,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         screen: screenName,
-        path: '_'
+        path: '_',
       })
 
       this.renderComponent()
@@ -71,7 +75,7 @@ new class extends UnitTestCase {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalled()
         expect(playMock).toHaveBeenCalledWith(songs)
-        expect(goMock).toHaveBeenCalledWith('queue')
+        expect(goMock).toHaveBeenCalledWith('/#/queue')
       })
     })
 
@@ -84,7 +88,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         screen: screenName,
-        path: '_'
+        path: '_',
       })
 
       this.renderComponent()
@@ -93,7 +97,7 @@ new class extends UnitTestCase {
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalled()
         expect(playMock).toHaveBeenCalledWith(songs)
-        expect(goMock).toHaveBeenCalledWith('queue')
+        expect(goMock).toHaveBeenCalledWith('/#/queue')
       })
     })
 
@@ -105,7 +109,7 @@ new class extends UnitTestCase {
 
       await this.router.activateRoute({
         screen: 'Songs',
-        path: '_'
+        path: '_',
       })
 
       this.renderComponent()
@@ -122,9 +126,9 @@ new class extends UnitTestCase {
     return this.render(FooterPlayButton, {
       global: {
         provide: {
-          [<symbol>CurrentPlayableKey]: ref(currentPlayable)
-        }
-      }
+          [<symbol>CurrentPlayableKey]: ref(currentPlayable),
+        },
+      },
     })
   }
 }

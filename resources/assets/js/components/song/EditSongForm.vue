@@ -166,10 +166,17 @@
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue'
 import { isEqual } from 'lodash'
-import { defaultCover, eventBus, pluralize } from '@/utils'
-import { songStore, SongUpdateData } from '@/stores'
-import { useDialogBox, useErrorHandler, useMessageToaster, useModal, useOverlay } from '@/composables'
-import { genres } from '@/config'
+import defaultCover from '@/../img/covers/default.svg'
+import { pluralize } from '@/utils/formatters'
+import { eventBus } from '@/utils/eventBus'
+import type { SongUpdateData } from '@/stores/songStore'
+import { songStore } from '@/stores/songStore'
+import { useDialogBox } from '@/composables/useDialogBox'
+import { useErrorHandler } from '@/composables/useErrorHandler'
+import { useMessageToaster } from '@/composables/useMessageToaster'
+import { useModal } from '@/composables/useModal'
+import { useOverlay } from '@/composables/useOverlay'
+import { genres } from '@/config/genres'
 
 import Btn from '@/components/ui/form/Btn.vue'
 import TextInput from '@/components/ui/form/TextInput.vue'
@@ -180,6 +187,8 @@ import TabList from '@/components/ui/tabs/TabList.vue'
 import TabButton from '@/components/ui/tabs/TabButton.vue'
 import TabPanel from '@/components/ui/tabs/TabPanel.vue'
 import TabPanelContainer from '@/components/ui/tabs/TabPanelContainer.vue'
+
+const emit = defineEmits<{ (e: 'close'): void }>()
 
 const { showOverlay, hideOverlay } = useOverlay()
 const { toastSuccess } = useMessageToaster()
@@ -193,7 +202,9 @@ const editingOnlyOneSong = songs.length === 1
 const inputPlaceholder = editingOnlyOneSong ? '' : 'Leave unchanged'
 
 const allSongsShareSameValue = (key: keyof Song) => {
-  if (editingOnlyOneSong) return true
+  if (editingOnlyOneSong) {
+    return true
+  }
   return new Set(songs.map(song => song[key])).size === 1
 }
 
@@ -210,7 +221,7 @@ const formData = reactive<SongUpdateData>({
   track: allSongsShareSameValue('track') && songs[0].track !== 0 ? songs[0].track : null,
   disc: allSongsShareSameValue('disc') && songs[0].disc !== 0 ? songs[0].disc : null,
   year: allSongsShareSameValue('year') ? songs[0].year : null,
-  genre: allSongsShareSameValue('genre') ? songs[0].genre : ''
+  genre: allSongsShareSameValue('genre') ? songs[0].genre : '',
 })
 
 // If the album artist(s) is the same as the artist(s), we set the form value as empty to not confuse the user
@@ -240,7 +251,6 @@ const displayedAlbumName = computed(() => {
   return allSongsAreInSameAlbum || formData.album_name ? formData.album_name : 'Mixed Albums'
 })
 
-const emit = defineEmits<{ (e: 'close'): void }>()
 const close = () => emit('close')
 
 const maybeClose = async () => {

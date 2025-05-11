@@ -3,9 +3,11 @@ import { expect, it } from 'vitest'
 import { screen } from '@testing-library/vue'
 import UnitTestCase from '@/__tests__/UnitTestCase'
 import factory from '@/__tests__/factory'
-import { eventBus } from '@/utils'
-import { downloadService, playbackService } from '@/services'
-import { commonStore, songStore } from '@/stores'
+import { eventBus } from '@/utils/eventBus'
+import { downloadService } from '@/services/downloadService'
+import { playbackService } from '@/services/playbackService'
+import { commonStore } from '@/stores/commonStore'
+import { songStore } from '@/stores/songStore'
 import AlbumContextMenu from './AlbumContextMenu.vue'
 
 let album: Album
@@ -62,7 +64,7 @@ new class extends UnitTestCase {
 
       await this.user.click(screen.getByText('Go to Album'))
 
-      expect(mock).toHaveBeenCalledWith(`album/${album.id}`)
+      expect(mock).toHaveBeenCalledWith(`/#/albums/${album.id}`)
     })
 
     it('does not have an option to download or go to Unknown Album and Artist', async () => {
@@ -79,13 +81,13 @@ new class extends UnitTestCase {
 
       await this.user.click(screen.getByText('Go to Artist'))
 
-      expect(mock).toHaveBeenCalledWith(`artist/${album.artist_id}`)
+      expect(mock).toHaveBeenCalledWith(`/#/artists/${album.artist_id}`)
     })
   }
 
   private async renderComponent (_album?: Album) {
     album = _album || factory('album', {
-      name: 'IV'
+      name: 'IV',
     })
 
     const rendered = this.render(AlbumContextMenu)
